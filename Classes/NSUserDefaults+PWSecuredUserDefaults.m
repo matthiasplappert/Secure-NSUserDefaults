@@ -174,9 +174,21 @@ static NSString *_secret;
 	} else if ([object isKindOfClass:[NSDictionary class]]) {
 		// Dictionary
 		NSMutableString *hash = [NSMutableString stringWithString:@"dictionary"];
+		
+		// Add hashes to a dictionary. We will sort them because NSDictionaries are not sorted.
+		NSMutableArray *hashes = [NSMutableArray array];
 		for (NSString *key in object) {
-			[hash appendFormat:@"%@%@", key, [self generateHashableStringFromObject:[object objectForKey:key]]];
+			[hashes addObject:[NSString stringWithFormat:@"%@%@", key, [self generateHashableStringFromObject:[object objectForKey:key]]]];
 		}
+		
+		// Now sort hashes...
+		[hashes sortUsingSelector:@selector(compare:)];
+		
+		// and transform them into one string
+		for (int i = 0; i < [hashes count]; i++) {
+			[hash appendString:[hashes objectAtIndex:i]];
+		}
+		
 		return hash;
 	} else {
 		// Everything else
@@ -188,12 +200,16 @@ static NSString *_secret;
 - (id)validateValueForKey:(NSString *)key
 {
 	NSDictionary *data = [self dictionaryForKey:key];
-	id value = [data objectForKey:@"value"];
-	NSString *hash = [data objectForKey:@"hash"];
-	
-	NSString *checkHash = [[NSString stringWithFormat:@"%@%@", [self generateHashableStringFromObject:value], _secret] md5Hash];
-	if ([checkHash isEqualToString:hash]) {
-		return value;
+	if (data != nil) {
+		id value = [data objectForKey:@"value"];
+		NSString *hash = [data objectForKey:@"hash"];
+		
+		NSString *checkHash = [[NSString stringWithFormat:@"%@%@", [self generateHashableStringFromObject:value], _secret] md5Hash];
+		if ([checkHash isEqualToString:hash]) {
+			return value;
+		} else {
+			return nil;
+		}
 	} else {
 		return nil;
 	}

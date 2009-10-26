@@ -6,12 +6,20 @@
 //  Copyright phapswebsolutions 2009. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#if MACOSX
+	#import <Cocoa/Cocoa.h>
+#elif IPHONE
+	#import <UIKit/UIKit.h>
+#endif
 
 int main(int argc, char *argv[]) {
     
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    int retVal = UIApplicationMain(argc, argv, nil, nil);
-    [pool release];
-    return retVal;
+	#if MACOSX
+		return NSApplicationMain(argc,  (const char **) argv);
+	#elif IPHONE
+		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+		int retVal = UIApplicationMain(argc, argv, nil, nil);
+		[pool release];
+		return retVal;
+	#endif
 }

@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class Test;
+
 @interface SecureUserDefaultsAppDelegate : NSObject <UIApplicationDelegate> {
     UIWindow *window;
+	Test *test;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;

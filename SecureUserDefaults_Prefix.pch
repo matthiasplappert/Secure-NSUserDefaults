@@ -4,5 +4,9 @@
 
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
-    #import <UIKit/UIKit.h>
+	#if IPHONE
+		#import <UIKit/UIKit.h>
+	#elif  MACOSX
+		#import <Cocoa/Cocoa.h>
+	#endif
 #endif

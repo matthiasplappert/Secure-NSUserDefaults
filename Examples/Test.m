@@ -1,38 +1,26 @@
 //
-//  SecureUserDefaultsAppDelegate.m
+//  Test.m
 //  SecureUserDefaults
 //
-//  Created by Matthias Plappert on 25.10.09.
-//  Copyright phapswebsolutions 2009. All rights reserved.
+//  Created by Matthias Plappert on 26.10.09.
+//  Copyright 2009 phapswebsolutions. All rights reserved.
 //
 
-#import "SecureUserDefaultsAppDelegate.h"
+#import "Test.h"
 #import "NSUserDefaults+PWSecuredUserDefaults.h"
 
-@implementation SecureUserDefaultsAppDelegate
+@implementation Test
 
-@synthesize window;
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application
++ (void)initialize
 {
-	// Save secret. Make sure that you don't tell anyone your secret.
-	// If you change this your existing secured user defaults will not be readable any more.
-	[NSUserDefaults setSecret:@"4a7tl2L0mxlE"];
-	
-    // Override point for customization after application launch
-    [window makeKeyAndVisible];
+	if (self == [Test class]) {
+		// Save secret. Make sure that you don't tell anyone your secret.
+		// If you change this your existing secured user defaults will not be readable any more.
+		[NSUserDefaults setSecret:@"4a7tl2L0mxlE"];
+	}
 }
 
-- (void)dealloc
-{
-    [window release];
-    [super dealloc];
-}
-
-#pragma mark -
-#pragma mark Example imlementation
-
-- (IBAction)writeTestUserDefaults
+- (void)write
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	
@@ -43,12 +31,12 @@
 	[defaults setSecuredInteger:1234 forKey:@"intTest"];
 	[defaults setSecuredObject:@"test" forKey:@"stringTest"];
 	[defaults setSecuredObject:[NSDate date] forKey:@"dateTest"];
-	[defaults setSecuredObject:[NSData dataWithContentsOfURL:[NSURL URLWithString:@"http://www.google.de"]] forKey:@"dataTest"];
+	[defaults setSecuredObject:[NSData data] forKey:@"dataTest"];
 	[defaults setSecuredObject:[NSArray arrayWithObjects:@"1", @"2", @"3", @"4", @"5", @"6", nil] forKey:@"arrayTest"];
-	[defaults setSecuredObject:[NSDictionary dictionaryWithObjectsAndKeys:@"value1", @"key1", [NSArray arrayWithObjects:[NSDate date], [NSNumber numberWithInt:123], nil], @"array", nil] forKey:@"dictionaryTest"];
+	[defaults setSecuredObject:[NSDictionary dictionaryWithObjectsAndKeys:@"value1", @"key1", [NSArray arrayWithObjects:[NSDate date], [NSNumber numberWithInt:123], nil], @"array", @"a1", @"b1", nil] forKey:@"dictionaryTest"];
 }
 
-- (IBAction)readTestUserDefaults
+- (void)read
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	
