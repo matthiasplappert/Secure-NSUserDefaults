@@ -9,10 +9,10 @@ Add `NSUserDefaults+MPSecureUserDefaults.h` and `NSUserDefaults+MPSecureUserDefa
     
     // Configuring user defaults. It is recommended that you do this
     // immediately after the app did launch.
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setSecret:@"shh, this is secret!"];
+    [NSUserDefaults setSecret:@"shh, this is secret!"];
 
     // Write secure user defaults
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setSecureBool:YES forKey:@"IsRegistered"];
     
     // Read secure user defaults
@@ -26,8 +26,8 @@ Add `NSUserDefaults+MPSecureUserDefaults.h` and `NSUserDefaults+MPSecureUserDefa
 
 ## Notes
 * Secure NSUserDefaults mimics the non-secure NSUserDefaults methods
-* If you try to access a key that doesn’t exist yet, it is considered valid nevertheless
-* Write your secret directly into the code
+* A key that doesn’t exist yet is considered valid
+* Do not read your secret from any resource but write it directly into your code
 
 ## MIT License
 Copyright (c) 2011 Matthias Plappert <matthiasplappert@me.com>
