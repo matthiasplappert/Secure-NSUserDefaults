@@ -1,8 +1,8 @@
 //
-//  Test.h
-//  SecureUserDefaults
+//  Example.pch
+//  Secure-NSUserDefaults
 //
-//  Copyright (c) 2009 Matthias Plappert <mplappert@phaps.de>
+//  Copyright (c) 2011 Matthias Plappert <matthiasplappert@me.com>
 //  
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 //  documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -16,13 +16,6 @@
 //  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
-
-@interface Test : NSObject {
-
-}
-
-- (void)write;
-- (void)read;
-
-@end
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif
