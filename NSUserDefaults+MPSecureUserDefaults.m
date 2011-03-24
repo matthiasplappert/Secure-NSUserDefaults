@@ -283,6 +283,9 @@ static NSData *_deviceIdentifierData = nil;
 		NSAssert(NO, @"Provide a secret before using any secure writing or reading methods!");
 		return nil;
 	}
+    
+    // Copy object to make sure it is immutable (thanks Stephen)
+    object = [[object copy] autorelease];
 	
 	// Archive & hash
 	NSMutableData *archivedData = [[NSKeyedArchiver archivedDataWithRootObject:object] mutableCopy];
