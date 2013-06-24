@@ -27,7 +27,7 @@ int main(int argc, const char * argv[])
 	// Get device identifier
 	NSString *deviceIdentifier = nil;
 #if TARGET_OS_IPHONE
-	deviceIdentifier = [[UIDevice currentDevice] uniqueIdentifier];
+    deviceIdentifier = [[UIDevice currentDevice] identifierForVendor];
 #else
 	io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,
 															  IOServiceMatching("IOPlatformExpertDevice"));
@@ -69,7 +69,7 @@ int main(int argc, const char * argv[])
 	NSLog(@"valid: %d\n\n", valid);
 	
 	valid = NO;
-	NSLog(@"secureIntegerForKey: %d", [defaults secureIntegerForKey:@"integer" valid:&valid]);
+	NSLog(@"secureIntegerForKey: %@", @([defaults secureIntegerForKey:@"integer" valid:&valid]));
 	NSLog(@"valid: %d\n\n", valid);
 	
 	// NSData, NSString, NSNumber & NSDate
