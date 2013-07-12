@@ -37,7 +37,10 @@
 
 /**
  * Read data from user defaults. If key doesn't exist, valid is YES and the function mimics
- * the return behavior of the respective non-secure method.
+ * the return behavior of the respective non-secure method. Please note that the methods below
+ * will always return the result, even if it is *NOT* secure. This is a change from previous versions
+ * of Secure-NSUserDefaults. It is therefore necessary to check to figure out an appropriate consequence
+ * for invalid defaults.
  */
 - (NSArray *)secureArrayForKey:(NSString *)key valid:(BOOL *)valid;
 - (BOOL)secureBoolForKey:(NSString *)key valid:(BOOL *)valid;

@@ -35,29 +35,30 @@ static NSString *const MPSecureUserDefaultsHashKey  = @"MPSecureUserDefaultsHash
 
 @implementation NSUserDefaults (MPSecureUserDefaults)
 
-static NSData *_secretData           = nil;
+#pragma mark - Static
+
+static NSData *_secretData = nil;
 static NSData *_deviceIdentifierData = nil;
 
 + (void)setSecret:(NSString *)secret
 {
 	if (_secretData == nil) {
-		_secretData = [[secret dataUsingEncoding:NSUTF8StringEncoding] retain];
+		_secretData = [secret dataUsingEncoding:NSUTF8StringEncoding];
 	} else {
-		NSAssert(NO, @"The secret has already been set");
+		NSAssert(NO, @"The secret has already been set.");
 	}
 }
 
 + (void)setDeviceIdentifier:(NSString *)deviceIdentifier
 {
 	if (_deviceIdentifierData == nil) {
-		_deviceIdentifierData = [[deviceIdentifier dataUsingEncoding:NSUTF8StringEncoding] retain];
+		_deviceIdentifierData = [deviceIdentifier dataUsingEncoding:NSUTF8StringEncoding];
 	} else {
-		NSAssert(NO, @"The device identifier has already been set");
+		NSAssert(NO, @"The device identifier has already been set.");
 	}
 }
 
-#pragma mark -
-#pragma mark Read accessors
+#pragma mark - Read Accessors
 
 - (NSArray *)secureArrayForKey:(NSString *)key valid:(BOOL *)valid
 {
@@ -162,8 +163,7 @@ static NSData *_deviceIdentifierData = nil;
 	}
 }
 
-#pragma mark -
-#pragma mark Write accessors
+#pragma mark - Write Accessors
 
 - (void)setSecureBool:(BOOL)value forKey:(NSString *)key
 {
@@ -177,7 +177,7 @@ static NSData *_deviceIdentifierData = nil;
 
 - (void)setSecureInteger:(NSInteger)value forKey:(NSString *)key
 {
-	[self setSecureObject:[NSNumber numberWithInt:value] forKey:key];
+	[self setSecureObject:[NSNumber numberWithInteger:value] forKey:key];
 }
 
 - (void)setSecureObject:(id)value forKey:(NSString *)key
@@ -189,8 +189,8 @@ static NSData *_deviceIdentifierData = nil;
 	} else if ([self _isValidPropertyListObject:value]) {
 		NSString *hash = [self _hashObject:value];
 		if (hash != nil) {
-			NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:value, MPSecureUserDefaultsValueKey,
-																			hash, MPSecureUserDefaultsHashKey, nil];
+			NSDictionary *dict = @{MPSecureUserDefaultsValueKey: value,
+                                   MPSecureUserDefaultsHashKey: hash};
 			[self setObject:dict forKey:key];
 		}
 	}
@@ -201,8 +201,7 @@ static NSData *_deviceIdentifierData = nil;
 	[self setSecureObject:[NSNumber numberWithDouble:value] forKey:key];
 }
 
-#pragma mark -
-#pragma mark Private methods
+#pragma mark - Private Methods
 
 - (BOOL)_isValidPropertyListObject:(id)object
 {
@@ -236,7 +235,7 @@ static NSData *_deviceIdentifierData = nil;
 		
 	} else {
 		static NSString *format = @"*** -[NSUserDefaults setSecureObject:forKey:]: Attempt to insert non-property value '%@' of class '%@'.";
-		NSLog(format, object, [object class]);
+		NSLog(format, object, NSStringFromClass([object class]));
 		return NO;
 	}
 }
@@ -246,33 +245,33 @@ static NSData *_deviceIdentifierData = nil;
 	NSDictionary *dict = [self dictionaryForKey:key];
 	if (dict == nil) {
 		// Doesn't exist, valid but nil
-		*valid = YES;
+		if (valid) *valid = YES;
 		return nil;
 	}
 	
 	if (![dict isKindOfClass:[NSDictionary class]]) {
 		// Not a dictionary -> invalid
-		*valid = NO;
+		if (valid) *valid = NO;
 		return nil;
 	}
 	
-	id value       = [dict objectForKey:MPSecureUserDefaultsValueKey];
-	NSString *hash = [dict objectForKey:MPSecureUserDefaultsHashKey];
-	if (value == nil || hash == nil) {
-		// Value or hash = nil -> invalid
-		*valid = NO;
+	id value = [dict objectForKey:MPSecureUserDefaultsValueKey];
+	if (value == nil) {
+		// Value nil -> invalid
+		if (valid) *valid = NO;
 		return nil;
 	}
 	
+    NSString *hash = [dict objectForKey:MPSecureUserDefaultsHashKey];
 	NSString *validationHash = [self _hashObject:value];
-	if (validationHash == nil || ![hash isEqualToString:validationHash]) {
-		// Invalid hash -> invalid
-		*valid = NO;
-		return nil;
+	if (hash == nil || validationHash == nil || ![hash isEqualToString:validationHash]) {
+		// Invalid hash -> invalid, but still return the value.
+		if (valid) *valid = NO;
+		return value;
 	}
 	
 	// Object is valid
-	*valid = YES;
+	if (valid) *valid = YES;
 	return value;
 }
 
@@ -285,7 +284,7 @@ static NSData *_deviceIdentifierData = nil;
 	}
     
     // Copy object to make sure it is immutable (thanks Stephen)
-    object = [[object copy] autorelease];
+    object = [object copy];
 	
 	// Archive & hash
 	NSMutableData *archivedData = [[NSKeyedArchiver archivedDataWithRootObject:object] mutableCopy];
@@ -294,7 +293,6 @@ static NSData *_deviceIdentifierData = nil;
 		[archivedData appendData:_deviceIdentifierData];
 	}
 	NSString *hash = [self _hashData:archivedData];
-	[archivedData release];
 	
 	return hash;
 }
@@ -303,7 +301,7 @@ static NSData *_deviceIdentifierData = nil;
 {
 	const char *cStr = [data bytes];
 	unsigned char digest[CC_MD5_DIGEST_LENGTH];
-	CC_MD5(cStr, [data length], digest);
+	CC_MD5(cStr, (CC_LONG)[data length], digest);
 	
 	static NSString *format = @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x";
 	NSString *hash = [NSString stringWithFormat:format, digest[0], digest[1], 

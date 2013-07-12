@@ -28,6 +28,7 @@ Add `NSUserDefaults+MPSecureUserDefaults.h` and `NSUserDefaults+MPSecureUserDefa
 * Secure NSUserDefaults mimics the non-secure NSUserDefaults methods
 * A key that doesn’t exist yet is considered valid
 * Do not read your secret from any resource but write it directly into your code
+* Accessors for invalid properties will still return the value, it is therefore necessary to always check the valid out-pointer!
 
 ## MIT License
 Copyright (c) 2011 Matthias Plappert <matthiasplappert@me.com>
