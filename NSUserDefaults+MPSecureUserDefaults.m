@@ -287,7 +287,16 @@ static NSData *_deviceIdentifierData = nil;
     object = [object copy];
 	
 	// Archive & hash
-	NSMutableData *archivedData = [[NSKeyedArchiver archivedDataWithRootObject:object] mutableCopy];
+	//NSMutableData *archivedData = [[NSKeyedArchiver archivedDataWithRootObject:object] mutableCopy]; // 'archivedDataWithRootObject:' is deprecated: first deprecated in iOS 12.0 - Use +archivedDataWithRootObject:requiringSecureCoding:error: instead
+    
+    NSError * error = nil;
+    NSMutableData *archivedData = [[NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:YES error:&error] mutableCopy];
+    
+    if(error != nil) {
+        NSLog(@"error: %@", error.description);
+        error = nil;
+    }
+    
 	[archivedData appendData:_secretData];
 	if (_deviceIdentifierData != nil) {
 		[archivedData appendData:_deviceIdentifierData];
@@ -299,20 +308,30 @@ static NSData *_deviceIdentifierData = nil;
 
 - (NSString *)_hashData:(NSData *)data
 {
-	const char *cStr = [data bytes];
-	unsigned char digest[CC_MD5_DIGEST_LENGTH];
-	CC_MD5(cStr, (CC_LONG)[data length], digest);
-	
-	static NSString *format = @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x";
-	NSString *hash = [NSString stringWithFormat:format, digest[0], digest[1], 
-														digest[2], digest[3],
-														digest[4], digest[5],
-														digest[6], digest[7],
-														digest[8], digest[9],
-														digest[10], digest[11],
-														digest[12], digest[13],
-														digest[14], digest[15]];
-	return hash;
+//	const char *cStr = [data bytes];
+//	unsigned char digest[CC_MD5_DIGEST_LENGTH];
+	//CC_MD5(cStr, (CC_LONG)[data length], digest); // 'CC_MD5' is deprecated: first deprecated in iOS 13.0 - This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).
+    //CC_MD5(cStr, (CC_LONG)[data length], digest);
+    
+//    static NSString *format = @"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x";
+//    NSString *hash = [NSString stringWithFormat:format, digest[0], digest[1],
+//                                                        digest[2], digest[3],
+//                                                        digest[4], digest[5],
+//                                                        digest[6], digest[7],
+//                                                        digest[8], digest[9],
+//                                                        digest[10], digest[11],
+//                                                        digest[12], digest[13],
+//                                                        digest[14], digest[15]];
+   
+        const char* utf8chars = [data bytes];
+        unsigned char result[CC_SHA256_DIGEST_LENGTH];
+        CC_SHA256(utf8chars, (CC_LONG)strlen(utf8chars), result);
+
+        NSMutableString *ret = [NSMutableString stringWithCapacity:CC_SHA256_DIGEST_LENGTH*2];
+        for(int i = 0; i<CC_SHA256_DIGEST_LENGTH; i++) {
+            [ret appendFormat:@"%02x",result[i]];
+        }
+	return ret;
 }
 
 @end
